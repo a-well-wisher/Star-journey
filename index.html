@@ -1,666 +1,777 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ek Khaas Baat...</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<title>Ek Chhota Safar</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@200;400;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --maroon:#2a0812;
-    --wine:#6e1b34;
-    --rose:#e07a95;
-    --blush:#f7e3e4;
-    --gold:#e6c068;
-    --cream:#fff8f3;
-    --ink:#2a1014;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    overflow: hidden;
+    font-family: 'Manrope', sans-serif;
+    color: #fff;
+    height: 100vh;
+    width: 100vw;
+  }
+  canvas { display: block; position: fixed; top: 0; left: 0; }
+
+  #ui {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    z-index: 10;
   }
 
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
-  body{
-    font-family:'Manrope', sans-serif;
-    background:linear-gradient(180deg, #2a0812 0%, #3a0d1a 50%, #2a0812 100%);
-    color:var(--cream);
-    overflow-x:hidden;
-    min-height:100vh;
+  .screen {
+    display: none;
+    pointer-events: auto;
+    max-width: 650px;
+    width: 100%;
+    animation: fadeIn 1.5s ease;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
   }
 
-  h1,h2,h3, .serif{ font-family:'Cormorant Garamond', serif; }
-
-  /* Floating hearts + petals */
-  #hearts{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-  .heart{
-    position:absolute;
-    bottom:-10%;
-    font-size:1.4rem;
-    opacity:0;
-    animation:rise linear infinite;
-    color:var(--rose);
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    letter-spacing: 8px;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #c9a24b, #f7e3e4, #e07a95, #c9a24b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 400% 400%;
+    animation: shimmer 6s ease-in-out infinite;
+    text-transform: uppercase;
   }
-  @keyframes rise{
-    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
-    10%{ opacity:0.5; }
-    100%{ transform:translateY(-110vh) translateX(var(--drift,20px)) rotate(360deg); opacity:0; }
-  }
-
-  section{
-    position:relative;
-    z-index:1;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:6vh 6vw;
-    text-align:center;
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
 
-  /* ===== HERO ===== */
-  #hero h1{
-    font-size:clamp(2.2rem, 6vw, 4.2rem);
-    font-weight:600;
-    line-height:1.15;
-    max-width:14ch;
-    animation:fadeInUp 1.2s ease;
-  }
-  @keyframes fadeInUp{
-    from{opacity:0; transform:translateY(30px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-  #hero .name{
-    color:var(--gold);
-    font-style:italic;
-    animation:shimmer 3s ease-in-out infinite;
-  }
-  @keyframes shimmer{
-    0%,100%{opacity:0.8; text-shadow:0 0 20px rgba(230,192,104,0.3);}
-    50%{opacity:1; text-shadow:0 0 40px rgba(230,192,104,0.8);}
-  }
-  #hero p{
-    margin-top:1.4rem;
-    font-size:1.05rem;
-    color:var(--blush);
-    max-width:36ch;
-    opacity:0.85;
-    animation:fadeInUp 1.4s ease;
-  }
-  .scroll-hint{
-    margin-top:3rem;
-    font-size:.85rem;
-    letter-spacing:.04em;
-    color:var(--rose);
-    animation:bob 2s ease-in-out infinite;
-  }
-  @keyframes bob{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(8px);}
+  p {
+    font-size: 1.15rem;
+    color: #ddd;
+    line-height: 2.2;
+    margin-bottom: 2rem;
+    font-weight: 200;
+    letter-spacing: 1.5px;
   }
 
-  /* ===== CARD ===== */
-  .card{
-    background:rgba(255,248,243,0.06);
-    border:1px solid rgba(230,192,104,0.35);
-    border-radius:18px;
-    padding:2.4rem 1.8rem;
-    max-width:520px;
-    width:100%;
-    backdrop-filter:blur(10px);
-    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  .btn {
+    background: transparent;
+    border: 1px solid rgba(201, 162, 75, 0.6);
+    color: #fff;
+    padding: 1.1rem 2.8rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Manrope', sans-serif;
+    letter-spacing: 4px;
+    margin: 0.5rem;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    font-weight: 400;
   }
-  .eyebrow{
-    color:var(--gold);
-    font-size:.85rem;
-    margin-bottom:.6rem;
-    letter-spacing:2px;
-    text-transform:uppercase;
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(201,162,75,0.5), transparent);
+    transition: left 0.8s;
   }
-  h2{
-    font-size:clamp(1.7rem,4vw,2.6rem);
-    font-weight:600;
-    margin-bottom:1.2rem;
-  }
-
-  /* ===== QUIZ ===== */
-  .quiz-q{ display:none; width:100%; }
-  .quiz-q.active{ display:block; animation:fadeInUp 0.6s ease; }
-  .quiz-q p.question{
-    font-size:1.15rem;
-    margin-bottom:1.4rem;
-    color:var(--cream);
-  }
-  .quiz-options{
-    display:flex;
-    flex-direction:column;
-    gap:.7rem;
-  }
-  .quiz-options button{
-    font-family:'Manrope', sans-serif;
-    background:transparent;
-    border:1px solid rgba(255,248,243,0.35);
-    color:var(--cream);
-    padding:.85rem 1rem;
-    border-radius:10px;
-    font-size:.95rem;
-    cursor:pointer;
-    transition:all .3s ease;
-    text-align:left;
-  }
-  .quiz-options button:hover{
-    background:rgba(224,122,149,0.25);
-    border-color:var(--rose);
-    transform:translateX(5px);
-  }
-  .quiz-options button.correct{
-    background:rgba(80,200,120,0.25);
-    border-color:#50c878;
-  }
-  .quiz-options button.wrong{
-    background:rgba(200,80,80,0.25);
-    border-color:#c85050;
-  }
-  .quiz-progress{
-    margin-top:1.6rem;
-    font-size:.8rem;
-    color:var(--rose);
-    letter-spacing:.03em;
-  }
-  .quiz-result{ display:none; }
-  .quiz-result.active{ display:block; animation:fadeInUp 0.6s ease; }
-  .quiz-result .score{
-    font-family:'Cormorant Garamond', serif;
-    font-size:2.6rem;
-    color:var(--gold);
-    margin:.6rem 0;
+  .btn:hover::before { left: 100%; }
+  .btn:hover {
+    background: rgba(201, 162, 75, 0.15);
+    border-color: #c9a24b;
+    box-shadow: 0 0 50px rgba(201, 162, 75, 0.7);
+    transform: translateY(-4px);
+    letter-spacing: 5px;
   }
 
-  /* ===== BUTTONS ===== */
-  .next-btn{
-    margin-top:2rem;
-    background:linear-gradient(135deg, var(--rose), #c9556f);
-    color:var(--cream);
-    border:none;
-    padding:.9rem 2.2rem;
-    border-radius:999px;
-    font-size:.95rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:all .3s ease;
-    font-family:'Manrope', sans-serif;
-    box-shadow:0 8px 22px rgba(201,85,111,0.3);
-  }
-  .next-btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 12px 30px rgba(201,85,111,0.5);
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
   }
 
-  /* ===== MEMORY GAME ===== */
-  .memory-grid{
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:10px;
-    max-width:400px;
-    width:100%;
-    margin:1.5rem auto;
+  .loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    flex-direction: column;
+    gap: 2.5rem;
+    transition: opacity 2s;
   }
-  .memory-card{
-    aspect-ratio:1;
-    background:linear-gradient(135deg, var(--wine), var(--maroon));
-    border:1px solid rgba(230,192,104,0.3);
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:1.8rem;
-    cursor:pointer;
-    transition:all 0.3s ease;
-    user-select:none;
-    color:transparent;
+  .loader.hide { opacity: 0; pointer-events: none; }
+  .loader-ring {
+    width: 100px; height: 100px;
+    border: 1px solid rgba(201,162,75,0.15);
+    border-top-color: #c9a24b;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+    position: relative;
   }
-  .memory-card:hover{ transform:scale(1.05); border-color:var(--gold); }
-  .memory-card.flipped{
-    background:rgba(255,248,243,0.1);
-    color:var(--cream);
+  .loader-ring::after {
+    content: '';
+    position: absolute;
+    top: 15px; left: 15px;
+    right: 15px; bottom: 15px;
+    border: 1px solid rgba(224,122,149,0.2);
+    border-bottom-color: #e07a95;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite reverse;
   }
-  .memory-card.matched{
-    background:rgba(230,192,104,0.2);
-    border-color:var(--gold);
-    cursor:default;
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
-
-  /* ===== LETTER ===== */
-  #letter .card{
-    text-align:left;
-    max-width:560px;
-  }
-  #letter p{
-    font-size:1.05rem;
-    line-height:1.85;
-    color:var(--blush);
-    margin-bottom:1rem;
-    opacity:0;
-    animation:fadeInUp 0.8s ease forwards;
-  }
-  #letter p:nth-child(1){ animation-delay:0.2s; }
-  #letter p:nth-child(2){ animation-delay:0.6s; }
-  #letter p:nth-child(3){ animation-delay:1.0s; }
-  #letter p:nth-child(4){ animation-delay:1.4s; }
-  #letter .sign{
-    font-family:'Cormorant Garamond', serif;
-    font-style:italic;
-    font-size:1.3rem;
-    color:var(--gold);
-    text-align:right;
-    margin-top:1.5rem;
-    opacity:0;
-    animation:fadeInUp 0.8s ease 1.8s forwards;
+  .loader-text {
+    font-size: 0.75rem;
+    color: rgba(201,162,75,0.6);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    font-weight: 300;
   }
 
-  /* ===== ASK ===== */
-  .ask-buttons{
-    display:flex;
-    gap:1rem;
-    flex-wrap:wrap;
-    justify-content:center;
-    margin-top:2rem;
+  .date-card {
+    background: rgba(201,162,75,0.06);
+    border: 1px solid rgba(201,162,75,0.4);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin: 2rem 0;
+    text-align: left;
+    line-height: 2.8;
+    font-size: 1.05rem;
+    backdrop-filter: blur(30px);
+    box-shadow: 0 20px 60px rgba(201,162,75,0.15), inset 0 0 60px rgba(201,162,75,0.03);
   }
-  .yes-btn, .no-btn{
-    font-family:'Manrope', sans-serif;
-    font-weight:700;
-    font-size:1rem;
-    padding:1rem 2.2rem;
-    border-radius:999px;
-    border:none;
-    cursor:pointer;
-    transition:all .3s ease;
+  .date-card strong { color: #c9a24b; font-weight: 600; letter-spacing: 2px; }
+
+  .response {
+    display: none;
+    margin-top: 2.5rem;
+    font-size: 1.1rem;
+    color: #e07a95;
+    line-height: 2.2;
+    padding: 1.5rem;
+    background: rgba(224,122,149,0.08);
+    border: 1px solid rgba(224,122,149,0.3);
+    border-radius: 20px;
+    animation: fadeIn 1s;
+    font-weight: 300;
+    letter-spacing: 1px;
   }
-  .yes-btn{
-    background:linear-gradient(135deg, var(--gold), #d4af37);
-    color:var(--maroon);
-    box-shadow:0 8px 22px rgba(230,192,104,0.4);
+  .response.show { display: block; }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #c9a24b, #e07a95) !important;
+    color: #000 !important;
+    border: none !important;
+    font-weight: 600;
+    letter-spacing: 3px;
   }
-  .yes-btn:hover{ transform:scale(1.08); box-shadow:0 12px 30px rgba(230,192,104,0.6); }
-  .no-btn{
-    background:transparent;
-    border:1px solid rgba(255,248,243,0.4);
-    color:var(--cream);
-    position:relative;
-    transition:transform 0.3s ease;
+  .btn-yes:hover {
+    box-shadow: 0 0 80px rgba(224,122,149,0.9) !important;
+    transform: translateY(-4px) scale(1.05) !important;
   }
 
-  #thanks{ display:none; }
-  #thanks.active{ display:flex; animation:fadeInUp 1s ease; }
-  #thanks h2{ color:var(--gold); }
-
-  /* ===== CONFETTI ===== */
-  #confetti{
-    position:fixed; top:0; left:0;
-    width:100%; height:100%;
-    pointer-events:none;
-    z-index:999;
-    display:none;
+  .progress-dots {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.6rem;
+    z-index: 20;
+    opacity: 0.6;
   }
-  #confetti.show{ display:block; }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.3);
+    transition: all 0.5s;
+  }
+  .dot.active {
+    background: #c9a24b;
+    box-shadow: 0 0 15px #c9a24b;
+    width: 20px;
+    border-radius: 3px;
+  }
 
-  footer{
-    position:relative;
-    z-index:1;
-    text-align:center;
-    padding:2rem;
-    font-size:.75rem;
-    color:rgba(255,248,243,0.4);
+  @media (max-width: 600px) {
+    h1 { font-size: 2rem; letter-spacing: 4px; }
+    p { font-size: 1rem; }
+    .btn { padding: 0.9rem 2rem; font-size: 0.8rem; letter-spacing: 3px; }
+    .date-card { padding: 1.8rem; }
   }
 </style>
 </head>
 <body>
 
-<div id="hearts"></div>
-<canvas id="confetti"></canvas>
+<div class="loader" id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Ek Chhota Safar</div>
+</div>
 
-<!-- HERO -->
-<section id="hero">
-  <h1>Kabhi kabhi kuch baatein<br>keh nahi paate,<br><span class="name">HER_NAME</span>...</h1>
-  <p>...to socha likh dun. Neeche thoda time nikalna, ek chhota sa safar hai — kuch sawaal, ek chhota sa khel, aur uske baad ek baat jo main tumse kehna chahta hoon.</p>
-  <div class="scroll-hint">niche scroll karo ↓</div>
-</section>
+<canvas id="scene"></canvas>
 
-<!-- QUIZ -->
-<section id="quiz">
-  <div class="card">
-    <div class="eyebrow">Zara dekhein</div>
-    <h2>Kitna jaanti ho mujhe?</h2>
+<div class="progress-dots" id="dots"></div>
 
-    <div class="quiz-q active" data-q="0">
-      <p class="question">1. Meri favourite cheez konsi hai jo tumhe pata hai?</p>
-      <div class="quiz-options">
-        <button onclick="answerQuiz(this, false)">Option A</button>
-        <button onclick="answerQuiz(this, true)">Option B (Sahi jawab)</button>
-        <button onclick="answerQuiz(this, false)">Option C</button>
-      </div>
-    </div>
+<div id="ui">
 
-    <div class="quiz-q" data-q="1">
-      <p class="question">2. Jab main udaas hota hun, to sabse pehle kya karta hun?</p>
-      <div class="quiz-options">
-        <button onclick="answerQuiz(this, true)">Option A (Sahi)</button>
-        <button onclick="answerQuiz(this, false)">Option B</button>
-        <button onclick="answerQuiz(this, false)">Option C</button>
-      </div>
-    </div>
+  <div class="screen active" id="screen-start">
+    <h1>Ek Chhota Safar</h1>
+    <p>Ek chhoti si duniya hai...<br>kya tum saath chalna chahogi?</p>
+    <button class="btn" onclick="goTo('1')">✦ Shuru Karein ✦</button>
+  </div>
 
-    <div class="quiz-q" data-q="2">
-      <p class="question">3. Humari sabse achi memory kaunsi hai, mere hisaab se?</p>
-      <div class="quiz-options">
-        <button onclick="answerQuiz(this, false)">Option A</button>
-        <button onclick="answerQuiz(this, false)">Option B</button>
-        <button onclick="answerQuiz(this, true)">Option C (Sahi)</button>
-      </div>
-    </div>
-
-    <div class="quiz-progress" id="quiz-progress">Sawaal 1 / 3</div>
-
-    <div class="quiz-result">
-      <div class="eyebrow">Result</div>
-      <div class="score" id="quiz-score">—</div>
-      <p style="color:var(--blush); font-size:.95rem;">Score jo bhi ho, ek baat pakki hai — tum mujhe jitna sochti ho, main utna hi tumhare baare mein sochta hun.</p>
-      <button class="next-btn" onclick="goToGame()">Aage badho →</button>
+  <div class="screen" id="screen-1">
+    <p>Zindagi mein sabse achhi cheez kya hai?</p>
+    <div class="options">
+      <button class="btn" onclick="goTo('2')">Paisa</button>
+      <button class="btn" onclick="goTo('2')">Kaam</button>
+      <button class="btn" onclick="goTo('2')">Apne Log</button>
+      <button class="btn" onclick="goTo('2')">Fame</button>
     </div>
   </div>
-</section>
 
-<!-- GAME 1: HEART CATCH -->
-<section id="game">
-  <div class="eyebrow">Pehla khel</div>
-  <h2>Dil pakdo!</h2>
-  <p style="color:var(--blush); opacity:.8; margin-bottom:1.2rem; max-width:34ch;">15 second mein jitne dil pakad sako, pakdo. Har dil = ek reason.</p>
-  <div id="game-area" style="position:relative; width:100%; max-width:520px; height:320px; border:1px dashed rgba(230,192,104,0.4); border-radius:18px; overflow:hidden; background:rgba(255,248,243,0.04);"></div>
-  <div id="score-display" style="margin-top:1.2rem; font-size:1.1rem; color:var(--gold);">Score: 0</div>
-  <div id="game-timer" style="font-size:.85rem; color:var(--rose); margin-top:.3rem;"></div>
-  <button class="next-btn" id="start-game" onclick="startGame()">Shuru karo</button>
-  <button class="next-btn" id="continue-btn" style="display:none;" onclick="goToMemory()">Aage badho →</button>
-</section>
-
-<!-- GAME 2: MEMORY MATCH -->
-<section id="memory">
-  <div class="eyebrow">Dusra khel</div>
-  <h2>Yaadein milao!</h2>
-  <p style="color:var(--blush); opacity:.8; margin-bottom:1.2rem; max-width:34ch;">Har jodi match karo — jaise humari yaadein match hoti hain.</p>
-  <div class="memory-grid" id="memory-grid"></div>
-  <div id="memory-status" style="margin-top:1rem; color:var(--gold); font-size:1rem;">Moves: 0</div>
-  <button class="next-btn" id="memory-continue" style="display:none;" onclick="goToLetter()">Aage badho →</button>
-</section>
-
-<!-- LETTER -->
-<section id="letter">
-  <div class="card">
-    <div class="eyebrow">Ab wo baat...</div>
-    <h2 class="serif">Ek khat, tumhare naam</h2>
-    <p>YAHAN APNI ASLI FEELINGS LIKHO — jitna khulke likhna chaho utna likho.</p>
-    <p>"Pata nahi ye kab shuru hua, lekin jab se hua hai, mere din tumhare messages ka intezaar karte hain. Tumhare saath baat karna, tumhari haasi sunna — ye sab mujhe accha lagta hai, aur dheere dheere ye acchha lagna kuch aur ban gaya."</p>
-    <p>"Main tumse dosti ke aage kuch chahta hun — tumhare saath waqt bitana, tumhe samajhna, aur agar tum bhi chaho, to tumhe kahin ghumane le jana."</p>
-    <div class="sign">— tumhara dost, jo ab thoda zyada hai</div>
-    <button class="next-btn" onclick="goToAsk()">Aage padho →</button>
+  <div class="screen" id="screen-2">
+    <p>Koi aisa jisse baat karke acha lagta hai?</p>
+    <div class="options">
+      <button class="btn" onclick="goTo('3')">Haan, hai</button>
+      <button class="btn" onclick="goTo('3')">Shayad</button>
+      <button class="btn" onclick="goTo('3')">Nahi</button>
+    </div>
   </div>
-</section>
 
-<!-- ASK -->
-<section id="ask">
-  <div class="eyebrow">Aakhri sawaal</div>
-  <h2>Kya tum mere saath kahin ghumne chalogi?</h2>
-  <p class="sub" style="color:var(--blush); opacity:.85; margin-bottom:2rem; max-width:32ch;">Koi pressure nahi — bas ek honest jawab kaafi hai.</p>
-  <div class="ask-buttons">
-    <button class="yes-btn" onclick="sayYes()">Haan, chalo! 💛</button>
-    <button class="no-btn" id="noBtn" onmouseover="dodgeNo()" onclick="dodgeNo()">Abhi nahi</button>
+  <div class="screen" id="screen-3">
+    <p>Woh insaan kaisa hai?</p>
+    <div class="options">
+      <button class="btn" onclick="goTo('4')">Funny</button>
+      <button class="btn" onclick="goTo('4')">Kind</button>
+      <button class="btn" onclick="goTo('4')">Sab Kuch</button>
+    </div>
   </div>
-</section>
 
-<!-- THANKS -->
-<section id="thanks">
-  <div class="eyebrow">🎉</div>
-  <h2>Shukriya, ye keh paana hi mere liye bahut tha.</h2>
-  <p style="color:var(--blush); max-width:32ch;">Jo bhi jawab ho, main khush hun ki maine tumse ye keh diya.</p>
-</section>
+  <div class="screen" id="screen-4">
+    <p>Uski sabse achhi baat kya hai?</p>
+    <div class="options">
+      <button class="btn" onclick="goTo('5')">Smile</button>
+      <button class="btn" onclick="goTo('5')">Baatein</button>
+      <button class="btn" onclick="goTo('5')">Nature</button>
+      <button class="btn" onclick="goTo('5')">Sab Kuch</button>
+    </div>
+  </div>
 
-<footer>banaya gaya, dil se.</footer>
+  <div class="screen" id="screen-5">
+    <p>Agar woh ek din door chali jaye?</p>
+    <div class="options">
+      <button class="btn" onclick="goTo('final')">Bura lagega</button>
+      <button class="btn" onclick="goTo('final')">Yaad aayegi</button>
+      <button class="btn" onclick="goTo('final')">Kuch adhura lagega</button>
+    </div>
+  </div>
 
-<script>
-  /* ===== BACKGROUND HEARTS ===== */
-  const heartsContainer = document.getElementById('hearts');
-  const heartChars = ['❤','💛','💕','✨','🌸'];
-  for(let i=0;i<30;i++){
-    const h = document.createElement('div');
-    h.className = 'heart';
-    h.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
-    h.style.left = Math.random()*100 + 'vw';
-    h.style.setProperty('--drift', (Math.random()*80-40)+'px');
-    h.style.animationDuration = (8 + Math.random()*10) + 's';
-    h.style.animationDelay = (Math.random()*10) + 's';
-    h.style.fontSize = (1 + Math.random()*1.4) + 'rem';
-    heartsContainer.appendChild(h);
+  <div class="screen" id="screen-final">
+    <h1>Bas Itna Kehna Tha</h1>
+    <p style="font-size:1.2rem; line-height:2.6;">
+      Tumse baat karke acha lagta hai.<br>
+      Tumhari presence kuch khaas hai.<br>
+      Tum special ho — shayad tumhe pata bhi nahi.<br><br>
+      <span style="color:#c9a24b; font-style:italic; font-family:'Cormorant Garamond', serif; font-size:1.4rem;">
+        Koi jawab ki zaroorat nahi.<br>
+        Bas itna jaan lo. 🤍
+      </span>
+    </p>
+    <button class="btn" onclick="goTo('bonus')">✦ Aage Badho ✦</button>
+  </div>
+
+  <div class="screen" id="screen-bonus">
+    <h1>Ek Aakhri Cheez</h1>
+    <p>Game toh khatam ho gaya...<br>par ek chhoti si dua baaki hai.</p>
+    <div class="date-card">
+      <strong>📍 Jagah:</strong> Coffee shop, phir park<br>
+      <strong>⏰ Time:</strong> Jab tum free ho<br>
+      <strong>🎯 Plan:</strong> Baatein, walk, aur ek achi si shaam
+    </div>
+    <p style="font-size:1rem; color:#aaa;">
+      Agar tumhe bura na lage, toh ek din saath ghoomne chalein?<br>
+      Bas ek dost ki tarah. Koi pressure nahi. 🤍
+    </p>
+    <div class="options">
+      <button class="btn btn-yes" onclick="respond('yes')">Haan, Chalo ✨</button>
+      <button class="btn" onclick="respond('maybe')">Shayad</button>
+      <button class="btn" onclick="respond('think')">Sochna Padega</button>
+    </div>
+    <div class="response" id="response"></div>
+  </div>
+
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// ===== SCENE =====
+const canvas = document.getElementById('scene');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.012);
+
+const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 0, 9);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.3;
+
+// ===== STARFIELD (4 layers) =====
+function createStars(count, size, color, radius) {
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count * 3; i++) {
+    pos[i] = (Math.random() - 0.5) * radius;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.PointsMaterial({
+    color, size,
+    transparent: true,
+    opacity: 0.9,
+    sizeAttenuation: true
+  });
+  return new THREE.Points(geo, mat);
+}
+
+const stars1 = createStars(4000, 0.06, 0xffffff, 400);
+const stars2 = createStars(2500, 0.12, 0xc9a24b, 500);
+const stars3 = createStars(2000, 0.1, 0xe07a95, 450);
+const stars4 = createStars(1500, 0.08, 0x6e1b34, 350);
+scene.add(stars1, stars2, stars3, stars4);
+
+// ===== NEBULA PARTICLES =====
+const nebulaGeo = new THREE.BufferGeometry();
+const nebulaCount = 1200;
+const nebulaPos = new Float32Array(nebulaCount * 3);
+const nebulaCol = new Float32Array(nebulaCount * 3);
+const palette = [
+  new THREE.Color(0xc9a24b),
+  new THREE.Color(0xe07a95),
+  new THREE.Color(0x6e1b34),
+  new THREE.Color(0xf7e3e4),
+  new THREE.Color(0xffffff)
+];
+for (let i = 0; i < nebulaCount; i++) {
+  nebulaPos[i*3] = (Math.random() - 0.5) * 100;
+  nebulaPos[i*3+1] = (Math.random() - 0.5) * 100;
+  nebulaPos[i*3+2] = (Math.random() - 0.5) * 100;
+  const c = palette[Math.floor(Math.random() * palette.length)];
+  nebulaCol[i*3] = c.r;
+  nebulaCol[i*3+1] = c.g;
+  nebulaCol[i*3+2] = c.b;
+}
+nebulaGeo.setAttribute('position', new THREE.BufferAttribute(nebulaPos, 3));
+nebulaGeo.setAttribute('color', new THREE.BufferAttribute(nebulaCol, 3));
+const nebulaMat = new THREE.PointsMaterial({
+  size: 0.6,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.85,
+  blending: THREE.AdditiveBlending
+});
+const nebula = new THREE.Points(nebulaGeo, nebulaMat);
+scene.add(nebula);
+
+// ===== SHOOTING STARS =====
+const shootingStars = [];
+function createShootingStar() {
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array([
+    0, 0, 0,
+    -2, 2, 0
+  ]);
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.9
+  });
+  const line = new THREE.Line(geo, mat);
+  line.position.set(
+    (Math.random() - 0.5) * 40,
+    15 + Math.random() * 10,
+    (Math.random() - 0.5) * 40
+  );
+  line.userData = {
+    velocity: new THREE.Vector3(-0.3 - Math.random() * 0.3, -0.4 - Math.random() * 0.3, 0),
+    life: 0,
+    maxLife: 100
+  };
+  scene.add(line);
+  shootingStars.push(line);
+}
+
+// ===== MAIN OBJECTS =====
+let mainObj = null;
+let ringObj = null;
+let targetScale = 1;
+
+function createMainObject(type) {
+  if (mainObj) {
+    scene.remove(mainObj);
+    mainObj = null;
+  }
+  if (ringObj) {
+    scene.remove(ringObj);
+    ringObj = null;
   }
 
-  /* ===== QUIZ ===== */
-  let currentQ = 0;
-  let score = 0;
-  const totalQ = 3;
+  let geo, mat;
 
-  function answerQuiz(btn, isCorrect){
-    const parent = btn.parentElement;
-    parent.querySelectorAll('button').forEach(b => b.disabled = true);
-    if(isCorrect){
-      btn.classList.add('correct');
-      score++;
-    } else {
-      btn.classList.add('wrong');
-      parent.querySelectorAll('button').forEach(b => {
-        if(b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+  switch(type) {
+    case 'star':
+      geo = new THREE.IcosahedronGeometry(1.4, 2);
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xc9a24b,
+        emissive: 0xc9a24b,
+        emissiveIntensity: 1.0,
+        metalness: 0.8,
+        roughness: 0.15
       });
+      break;
+    case 'diamond':
+      geo = new THREE.OctahedronGeometry(1.5, 0);
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xf7e3e4,
+        emissive: 0xe07a95,
+        emissiveIntensity: 0.9,
+        metalness: 0.95,
+        roughness: 0.05
+      });
+      break;
+    case 'planet':
+      geo = new THREE.SphereGeometry(1.4, 64, 64);
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xe07a95,
+        emissive: 0x6e1b34,
+        emissiveIntensity: 0.7,
+        metalness: 0.5,
+        roughness: 0.4
+      });
+      const ringGeo = new THREE.TorusGeometry(2.4, 0.1, 16, 120);
+      const ringMat = new THREE.MeshStandardMaterial({
+        color: 0xc9a24b,
+        emissive: 0xc9a24b,
+        emissiveIntensity: 0.6,
+        metalness: 1,
+        roughness: 0.1
+      });
+      ringObj = new THREE.Mesh(ringGeo, ringMat);
+      ringObj.rotation.x = Math.PI / 2.3;
+      scene.add(ringObj);
+      break;
+    case 'cosmic':
+      geo = new THREE.TorusKnotGeometry(1.1, 0.35, 120, 20);
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xc9a24b,
+        emissive: 0xc9a24b,
+        emissiveIntensity: 1.1,
+        metalness: 0.95,
+        roughness: 0.05
+      });
+      break;
+    case 'bright':
+      geo = new THREE.SphereGeometry(1.6, 64, 64);
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xc9a24b,
+        emissiveIntensity: 2.2,
+        metalness: 0.7,
+        roughness: 0.1
+      });
+      break;
+    case 'heart':
+      const heartShape = new THREE.Shape();
+      heartShape.moveTo(0, 0.5);
+      heartShape.bezierCurveTo(0, 0.8, -0.4, 1, -0.6, 0.6);
+      heartShape.bezierCurveTo(-0.8, 0.2, -0.6, -0.3, 0, -0.8);
+      heartShape.bezierCurveTo(0.6, -0.3, 0.8, 0.2, 0.6, 0.6);
+      heartShape.bezierCurveTo(0.4, 1, 0, 0.8, 0, 0.5);
+      const heartGeo = new THREE.ExtrudeGeometry(heartShape, {
+        depth: 0.5,
+        bevelEnabled: true,
+        bevelThickness: 0.12,
+        bevelSize: 0.12,
+        bevelSegments: 4
+      });
+      heartGeo.center();
+      heartGeo.scale(2, 2, 2);
+      geo = heartGeo;
+      mat = new THREE.MeshStandardMaterial({
+        color: 0xe07a95,
+        emissive: 0xe07a95,
+        emissiveIntensity: 1.5,
+        metalness: 0.8,
+        roughness: 0.15
+      });
+      break;
+  }
+
+  mainObj = new THREE.Mesh(geo, mat);
+  mainObj.scale.set(0, 0, 0);
+  targetScale = 1;
+  scene.add(mainObj);
+
+  const glowGeo = new THREE.SphereGeometry(3, 32, 32);
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: 0xc9a24b,
+    transparent: true,
+    opacity: 0.04,
+    side: THREE.BackSide
+  });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  mainObj.add(glow);
+}
+
+createMainObject('star');
+
+// ===== LIGHTS =====
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+const light1 = new THREE.PointLight(0xc9a24b, 4, 120);
+light1.position.set(10, 10, 10);
+scene.add(light1);
+
+const light2 = new THREE.PointLight(0xe07a95, 4, 120);
+light2.position.set(-10, -10, 10);
+scene.add(light2);
+
+const light3 = new THREE.PointLight(0x6e1b34, 3, 120);
+light3.position.set(0, 12, -12);
+scene.add(light3);
+
+// ===== MOUSE / TOUCH =====
+let mx = 0, my = 0;
+document.addEventListener('mousemove', (e) => {
+  mx = (e.clientX / window.innerWidth) * 2 - 1;
+  my = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+document.addEventListener('touchmove', (e) => {
+  const t = e.touches[0];
+  mx = (t.clientX / window.innerWidth) * 2 - 1;
+  my = -(t.clientY / window.innerHeight) * 2 + 1;
+});
+
+// ===== ANIMATE =====
+let t = 0;
+let shootTimer = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.005;
+
+  stars1.rotation.y += 0.00015;
+  stars1.rotation.x += 0.00008;
+  stars2.rotation.y -= 0.00025;
+  stars3.rotation.y += 0.00035;
+  stars4.rotation.y -= 0.0002;
+
+  nebula.rotation.y += 0.0006;
+  nebula.rotation.x += 0.00025;
+
+  if (mainObj) {
+    mainObj.rotation.y += 0.01;
+    mainObj.rotation.x += 0.005;
+    mainObj.position.y = Math.sin(t) * 0.35;
+
+    const s = mainObj.scale.x;
+    const newScale = s + (targetScale - s) * 0.05;
+    mainObj.scale.set(newScale, newScale, newScale);
+  }
+
+  if (ringObj) {
+    ringObj.rotation.z += 0.008;
+    ringObj.position.y = Math.sin(t) * 0.35;
+  }
+
+  light1.position.x = Math.cos(t) * 12;
+  light1.position.z = Math.sin(t) * 12;
+  light2.position.x = Math.cos(t + Math.PI) * 12;
+  light2.position.z = Math.sin(t + Math.PI) * 12;
+
+  // Shooting stars
+  shootTimer++;
+  if (shootTimer > 90 && Math.random() > 0.7) {
+    createShootingStar();
+    shootTimer = 0;
+  }
+
+  for (let i = shootingStars.length - 1; i >= 0; i--) {
+    const s = shootingStars[i];
+    s.position.add(s.userData.velocity);
+    s.userData.life++;
+    s.material.opacity = Math.max(0, 1 - s.userData.life / s.userData.maxLife);
+    if (s.userData.life > s.userData.maxLife) {
+      scene.remove(s);
+      shootingStars.splice(i, 1);
     }
-
-    setTimeout(() => {
-      currentQ++;
-      if(currentQ < totalQ){
-        document.querySelector(`.quiz-q[data-q="${currentQ-1}"]`).classList.remove('active');
-        document.querySelector(`.quiz-q[data-q="${currentQ}"]`).classList.add('active');
-        document.getElementById('quiz-progress').textContent = `Sawaal ${currentQ+1} / ${totalQ}`;
-      } else {
-        document.querySelector(`.quiz-q[data-q="${currentQ-1}"]`).classList.remove('active');
-        document.getElementById('quiz-progress').style.display='none';
-        document.querySelector('.quiz-result').classList.add('active');
-        document.getElementById('quiz-score').textContent = `${score} / ${totalQ} 💫`;
-      }
-    }, 800);
   }
 
-  function goToGame(){ document.getElementById('game').scrollIntoView({behavior:'smooth'}); }
-  function goToMemory(){ document.getElementById('memory').scrollIntoView({behavior:'smooth'}); }
-  function goToLetter(){ document.getElementById('letter').scrollIntoView({behavior:'smooth'}); }
-  function goToAsk(){ document.getElementById('ask').scrollIntoView({behavior:'smooth'}); }
+  camera.position.x += (mx * 2.5 - camera.position.x) * 0.02;
+  camera.position.y += (my * 2.5 - camera.position.y) * 0.02;
+  camera.lookAt(0, 0, 0);
 
-  /* ===== GAME 1: HEART CATCH ===== */
-  let gameScore = 0;
-  let gameInterval, spawnInterval, timeLeft = 15;
-  const reasons = [
-    "kyunki tum jab hasti ho, sab hasin lagta hai",
-    "kyunki tumse baat karke din achha ho jaata hai",
-    "kyunki tum meri fikr karti ho",
-    "kyunki tumhare saath sab simple lagta hai",
-    "kyunki tum genuinely achi insaan ho",
-    "kyunki tumhari company sabse alag lagti hai"
-  ];
-  function startGame(){
-    gameScore = 0; timeLeft = 15;
-    document.getElementById('score-display').textContent = 'Score: 0';
-    document.getElementById('start-game').style.display='none';
-    const area = document.getElementById('game-area');
-    area.innerHTML = '';
-    spawnInterval = setInterval(spawnHeart, 700);
-    gameInterval = setInterval(()=>{
-      timeLeft--;
-      document.getElementById('game-timer').textContent = `Time: ${timeLeft}s`;
-      if(timeLeft<=0){ endGame(); }
-    },1000);
+  renderer.render(scene, camera);
+}
+animate();
+
+// ===== RESIZE =====
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== GAME LOGIC =====
+const screens = {
+  start: document.getElementById('screen-start'),
+  '1': document.getElementById('screen-1'),
+  '2': document.getElementById('screen-2'),
+  '3': document.getElementById('screen-3'),
+  '4': document.getElementById('screen-4'),
+  '5': document.getElementById('screen-5'),
+  final: document.getElementById('screen-final'),
+  bonus: document.getElementById('screen-bonus')
+};
+
+const objMap = {
+  start: 'star',
+  '1': 'star',
+  '2': 'diamond',
+  '3': 'planet',
+  '4': 'cosmic',
+  '5': 'bright',
+  final: 'bright',
+  bonus: 'heart'
+};
+
+window.goTo = function(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+  if (objMap[name]) {
+    createMainObject(objMap[name]);
   }
-  function spawnHeart(){
-    const area = document.getElementById('game-area');
-    const h = document.createElement('div');
-    h.className = 'falling-heart';
-    h.textContent = ['❤','💛','💕'][Math.floor(Math.random()*3)];
-    h.style.position='absolute';
-    h.style.top='-40px';
-    h.style.left = Math.random()*(area.clientWidth-30) + 'px';
-    h.style.fontSize='1.8rem';
-    h.style.cursor='pointer';
-    h.style.userSelect='none';
-    h.style.animation = `fall ${(2 + Math.random()*1.5)}s linear forwards`;
-    h.onclick = () => {
-      gameScore++;
-      document.getElementById('score-display').textContent = `Score: ${gameScore} — ${reasons[Math.floor(Math.random()*reasons.length)]}`;
-      h.remove();
-    };
-    h.addEventListener('animationend', ()=> h.remove());
-    area.appendChild(h);
+  updateDots(name);
+};
+
+window.respond = function(type) {
+  const res = document.getElementById('response');
+  res.classList.add('show');
+  if (type === 'yes') {
+    res.innerHTML = '🎉 Yay! Phir ek din plan karte hain.<br>Koi pressure nahi — bas ek achi si shaam. 🤍';
+    startConfetti();
+  } else if (type === 'maybe') {
+    res.innerHTML = '😊 Koi baat nahi. Jab mann kare, bata dena.<br>Main wait karunga. ✨';
+  } else {
+    res.innerHTML = '💭 Bilkul, soch lo. Koi jaldi nahi.<br>Tumhari marzi. 🤍';
   }
-  function endGame(){
-    clearInterval(spawnInterval);
-    clearInterval(gameInterval);
-    document.getElementById('game-timer').textContent = 'Khatam!';
-    document.getElementById('continue-btn').style.display='inline-block';
-  }
+};
 
-  /* ===== GAME 2: MEMORY MATCH ===== */
-  const memoryIcons = ['🌸','💛','✨','🌹','💫','🎀','🦋','🌙'];
-  let memoryCards = [];
-  let flipped = [];
-  let matched = 0;
-  let moves = 0;
-  let lock = false;
+// ===== PROGRESS DOTS =====
+const screenOrder = ['start', '1', '2', '3', '4', '5', 'final', 'bonus'];
+const dotsContainer = document.getElementById('dots');
+screenOrder.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dotsContainer.appendChild(dot);
+});
 
-  function initMemory(){
-    memoryCards = [...memoryIcons, ...memoryIcons].sort(() => Math.random() - 0.5);
-    const grid = document.getElementById('memory-grid');
-    grid.innerHTML = '';
-    matched = 0;
-    moves = 0;
-    flipped = [];
-    lock = false;
-    document.getElementById('memory-status').textContent = 'Moves: 0';
-    document.getElementById('memory-continue').style.display='none';
+function updateDots(name) {
+  const idx = screenOrder.indexOf(name);
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
 
-    memoryCards.forEach((icon, i) => {
-      const card = document.createElement('div');
-      card.className = 'memory-card';
-      card.dataset.icon = icon;
-      card.dataset.index = i;
-      card.onclick = () => flipCard(card);
-      grid.appendChild(card);
+// ===== CONFETTI =====
+function startConfetti() {
+  const c = document.createElement('canvas');
+  c.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;';
+  document.body.appendChild(c);
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+
+  const colors = ['#c9a24b', '#e07a95', '#f7e3e4', '#ffffff', '#6e1b34'];
+  const pieces = [];
+  for (let i = 0; i < 250; i++) {
+    pieces.push({
+      x: Math.random() * c.width,
+      y: Math.random() * -c.height,
+      w: Math.random() * 12 + 4,
+      h: Math.random() * 12 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      speed: Math.random() * 4 + 2,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.3
     });
   }
-
-  function flipCard(card){
-    if(lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-    card.classList.add('flipped');
-    card.textContent = card.dataset.icon;
-    flipped.push(card);
-
-    if(flipped.length === 2){
-      lock = true;
-      moves++;
-      document.getElementById('memory-status').textContent = `Moves: ${moves}`;
-      if(flipped[0].dataset.icon === flipped[1].dataset.icon){
-        flipped[0].classList.add('matched');
-        flipped[1].classList.add('matched');
-        matched++;
-        flipped = [];
-        lock = false;
-        if(matched === memoryIcons.length){
-          document.getElementById('memory-status').textContent = `🎉 Sab match! Moves: ${moves}`;
-          document.getElementById('memory-continue').style.display='inline-block';
-        }
-      } else {
-        setTimeout(() => {
-          flipped[0].classList.remove('flipped');
-          flipped[1].classList.remove('flipped');
-          flipped[0].textContent = '';
-          flipped[1].textContent = '';
-          flipped = [];
-          lock = false;
-        }, 800);
-      }
-    }
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    pieces.forEach(p => {
+      p.y += p.speed;
+      p.angle += p.spin;
+      p.x += Math.sin(p.angle) * 2;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (frame < 500) requestAnimationFrame(draw);
+    else c.remove();
   }
+  draw();
+}
 
-  initMemory();
-
-  /* ===== DODGE NO BUTTON ===== */
-  function dodgeNo(){
-    const btn = document.getElementById('noBtn');
-    const maxX = window.innerWidth * 0.3;
-    const maxY = 40;
-    const x = (Math.random()*2-1)*maxX;
-    const y = (Math.random()*2-1)*maxY;
-    btn.style.transform = `translate(${x}px, ${y}px)`;
-  }
-
-  /* ===== YES → CONFETTI + WHATSAPP ===== */
-  function sayYes(){
-    document.getElementById('ask').style.display='none';
-    document.getElementById('thanks').classList.add('active');
-    startConfetti();
-    const number = "916398467620";
-    const message = encodeURIComponent("Haan! Main tumhare saath ghumne chalungi 💛 (ye reply maine tumhari website se bheja)");
-    const waLink = `https://wa.me/${number}?text=${message}`;
-    setTimeout(() => window.open(waLink, '_blank'), 1500);
-  }
-
-  /* ===== CONFETTI ===== */
-  function startConfetti(){
-    const c = document.getElementById('confetti');
-    c.classList.add('show');
-    const ctx = c.getContext('2d');
-    c.width = window.innerWidth;
-    c.height = window.innerHeight;
-    const pieces = [];
-    const colors = ['#e6c068','#e07a95','#f7e3e4','#c9556f','#fff'];
-    for(let i=0;i<180;i++){
-      pieces.push({
-        x: Math.random()*c.width,
-        y: Math.random()*-c.height,
-        w: Math.random()*10+5,
-        h: Math.random()*10+5,
-        color: colors[Math.floor(Math.random()*colors.length)],
-        speed: Math.random()*3+2,
-        angle: Math.random()*Math.PI*2,
-        spin: (Math.random()-0.5)*0.2
-      });
-    }
-    let frame = 0;
-    function draw(){
-      ctx.clearRect(0,0,c.width,c.height);
-      pieces.forEach(p => {
-        p.y += p.speed;
-        p.angle += p.spin;
-        p.x += Math.sin(p.angle)*1.5;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.angle);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-        ctx.restore();
-      });
-      frame++;
-      if(frame < 400) requestAnimationFrame(draw);
-      else c.classList.remove('show');
-    }
-    draw();
-  }
-
-  /* Keyframes for falling hearts */
-  const style = document.createElement('style');
-  style.textContent = `@keyframes fall { to { transform: translateY(360px); } }`;
-  document.head.appendChild(style);
+// ===== HIDE LOADER =====
+setTimeout(() => {
+  document.getElementById('loader').classList.add('hide');
+}, 2800);
 </script>
 
 </body>
